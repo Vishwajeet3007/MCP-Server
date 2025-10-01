@@ -2,15 +2,16 @@ from fastmcp import FastMCP
 import os
 import aiosqlite
 import sqlite3
-import tempfile
 import json
-from datetime import datetime
 
 # -------------------- CONFIG --------------------
-# Save DB in the same folder as main.py
-DB_PATH = os.path.join(os.path.dirname(__file__), "expenses.db")
+# Create a data folder inside the project for DB and categories
+BASE_DIR = os.path.dirname(__file__)
+DATA_DIR = os.path.join(BASE_DIR, "data")
+os.makedirs(DATA_DIR, exist_ok=True)
 
-CATEGORIES_PATH = os.path.join(os.path.dirname(__file__), "categories.json")
+DB_PATH = os.path.join(DATA_DIR, "expenses.db")
+CATEGORIES_PATH = os.path.join(DATA_DIR, "categories.json")
 
 # Initialize MCP server
 mcp = FastMCP("ExpenseTracker")
@@ -40,7 +41,6 @@ init_db()
 # -------------------- TOOLS --------------------
 @mcp.tool()
 async def add_expense(date, amount, category, subcategory="", note=""):
-    """Add a new expense entry."""
     try:
         async with aiosqlite.connect(DB_PATH) as c:
             cur = await c.execute(
@@ -55,7 +55,6 @@ async def add_expense(date, amount, category, subcategory="", note=""):
 
 @mcp.tool()
 async def list_expenses(start_date, end_date):
-    """List expenses within a date range."""
     try:
         async with aiosqlite.connect(DB_PATH) as c:
             cur = await c.execute(
@@ -72,7 +71,6 @@ async def list_expenses(start_date, end_date):
 
 @mcp.tool()
 async def summarize(start_date, end_date, category=None):
-    """Summarize expenses by category."""
     try:
         async with aiosqlite.connect(DB_PATH) as c:
             query = """SELECT category, SUM(amount) AS total_amount, COUNT(*) as count
@@ -91,7 +89,6 @@ async def summarize(start_date, end_date, category=None):
 
 @mcp.tool()
 async def edit_expense(expense_id, date=None, amount=None, category=None, subcategory=None, note=None):
-    """Edit an existing expense by ID."""
     try:
         async with aiosqlite.connect(DB_PATH) as c:
             fields, params = [], []
@@ -113,7 +110,6 @@ async def edit_expense(expense_id, date=None, amount=None, category=None, subcat
 
 @mcp.tool()
 async def delete_expense(expense_id):
-    """Delete an expense by ID."""
     try:
         async with aiosqlite.connect(DB_PATH) as c:
             cur = await c.execute("DELETE FROM expenses WHERE id = ?", (expense_id,))
@@ -124,7 +120,6 @@ async def delete_expense(expense_id):
 
 @mcp.tool()
 async def search_expenses(keyword):
-    """Search expenses by keyword in note/category/subcategory."""
     try:
         async with aiosqlite.connect(DB_PATH) as c:
             cur = await c.execute(
@@ -141,7 +136,6 @@ async def search_expenses(keyword):
 
 @mcp.tool()
 async def monthly_report(year):
-    """Generate a monthly expense report for a given year."""
     try:
         async with aiosqlite.connect(DB_PATH) as c:
             cur = await c.execute(
@@ -161,7 +155,6 @@ async def monthly_report(year):
 
 @mcp.resource("expense:///categories", mime_type="application/json")
 def categories():
-    """Return categories from file or default."""
     default_categories = {
         "categories": [
             "Food & Dining", "Transportation", "Shopping", "Entertainment",
@@ -180,5 +173,6 @@ def categories():
 
 # -------------------- START SERVER --------------------
 if __name__ == "__main__":
-    # Run MCP server without proxy
+    # Run MCP server
+    # No proxy, no temp folder, DB in project folder
     mcp.run(transport="http", host="0.0.0.0", port=8000)
