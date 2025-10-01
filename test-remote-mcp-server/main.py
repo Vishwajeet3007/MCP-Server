@@ -6,18 +6,12 @@ import json
 import tempfile
 
 # -------------------- CONFIG --------------------
-# Detect if running on FastMCP cloud
-# If so, use temp folder for writable files; otherwise, use project 'data/' folder
-BASE_DIR = os.path.dirname(__file__)
-LOCAL_DATA_DIR = os.path.join(BASE_DIR, "data")
-CLOUD_DATA_DIR = tempfile.gettempdir()
+# Use temporary directory which should be writable
+TEMP_DIR = tempfile.gettempdir()
+DB_PATH = os.path.join(TEMP_DIR, "expenses.db")
+CATEGORIES_PATH = os.path.join(os.path.dirname(__file__), "categories.json")
 
-# Choose folder
-DATA_DIR = LOCAL_DATA_DIR if os.path.exists(LOCAL_DATA_DIR) else CLOUD_DATA_DIR
-os.makedirs(DATA_DIR, exist_ok=True)
-
-DB_PATH = os.path.join(DATA_DIR, "expenses.db")
-CATEGORIES_PATH = os.path.join(DATA_DIR, "categories.json")
+print(f"Database path: {DB_PATH}")
 
 # Initialize MCP server
 mcp = FastMCP("ExpenseTracker")
