@@ -8,7 +8,7 @@ import json
 # Create a data folder inside the project for DB and categories
 BASE_DIR = os.path.dirname(__file__)
 DATA_DIR = os.path.join(BASE_DIR, "data")
-os.makedirs(DATA_DIR, exist_ok=True)
+os.makedirs(DATA_DIR, exist_ok=True)  # Ensure folder exists
 
 DB_PATH = os.path.join(DATA_DIR, "expenses.db")
 CATEGORIES_PATH = os.path.join(DATA_DIR, "categories.json")
@@ -174,5 +174,5 @@ def categories():
 # -------------------- START SERVER --------------------
 if __name__ == "__main__":
     # Run MCP server
-    # No proxy, no temp folder, DB in project folder
+    # DB is persistent in 'data/' folder
     mcp.run(transport="http", host="0.0.0.0", port=8000)
