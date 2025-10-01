@@ -6,12 +6,13 @@ import json
 import tempfile
 
 # -------------------- CONFIG --------------------
-# Use temporary directory which should be writable
+# Use temporary writable directory for DB and categories
 TEMP_DIR = tempfile.gettempdir()
 DB_PATH = os.path.join(TEMP_DIR, "expenses.db")
-CATEGORIES_PATH = os.path.join(os.path.dirname(__file__), "categories.json")
+CATEGORIES_PATH = os.path.join(TEMP_DIR, "categories.json")
 
 print(f"Database path: {DB_PATH}")
+print(f"Categories path: {CATEGORIES_PATH}")
 
 # Initialize MCP server
 mcp = FastMCP("ExpenseTracker")
