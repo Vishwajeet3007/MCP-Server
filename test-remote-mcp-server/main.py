@@ -6,10 +6,12 @@ import json
 import tempfile
 
 # -------------------- CONFIG --------------------
-# Use temporary writable directory for DB and categories
-TEMP_DIR = tempfile.gettempdir()
-DB_PATH = os.path.join(TEMP_DIR, "expenses.db")
-CATEGORIES_PATH = os.path.join(TEMP_DIR, "categories.json")
+# Create a temp data folder for DB and categories
+TEMP_DATA_DIR = os.path.join(tempfile.gettempdir(), "expense_tracker_data")
+os.makedirs(TEMP_DATA_DIR, exist_ok=True)
+
+DB_PATH = os.path.join(TEMP_DATA_DIR, "expenses.db")
+CATEGORIES_PATH = os.path.join(TEMP_DATA_DIR, "categories.json")
 
 print(f"Database path: {DB_PATH}")
 print(f"Categories path: {CATEGORIES_PATH}")
