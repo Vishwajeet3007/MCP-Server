@@ -3,12 +3,18 @@ import os
 import aiosqlite
 import sqlite3
 import json
+import tempfile
 
 # -------------------- CONFIG --------------------
-# Create a data folder inside the project for DB and categories
+# Detect if running on FastMCP cloud
+# If so, use temp folder for writable files; otherwise, use project 'data/' folder
 BASE_DIR = os.path.dirname(__file__)
-DATA_DIR = os.path.join(BASE_DIR, "data")
-os.makedirs(DATA_DIR, exist_ok=True)  # Ensure folder exists
+LOCAL_DATA_DIR = os.path.join(BASE_DIR, "data")
+CLOUD_DATA_DIR = tempfile.gettempdir()
+
+# Choose folder
+DATA_DIR = LOCAL_DATA_DIR if os.path.exists(LOCAL_DATA_DIR) else CLOUD_DATA_DIR
+os.makedirs(DATA_DIR, exist_ok=True)
 
 DB_PATH = os.path.join(DATA_DIR, "expenses.db")
 CATEGORIES_PATH = os.path.join(DATA_DIR, "categories.json")
@@ -173,6 +179,4 @@ def categories():
 
 # -------------------- START SERVER --------------------
 if __name__ == "__main__":
-    # Run MCP server
-    # DB is persistent in 'data/' folder
     mcp.run(transport="http", host="0.0.0.0", port=8000)
